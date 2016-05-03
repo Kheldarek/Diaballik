@@ -1,18 +1,13 @@
 package diaballik.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 import diaballik.ApplicationBuilder;
-import diaballik.logic.Board;
 import diaballik.logic.Game;
-import diaballik.logic.Rulebook;
 import diaballik.logic.board.Coordinate;
 import diaballik.logic.board.IllegalMovementException;
 import diaballik.logic.board.parser.CoordinateParser;
 import diaballik.logic.board.parser.IncorrectInputException;
-import diaballik.logic.rule.Rule;
 
 public class TextualUI {
 	private Game diaballik;
