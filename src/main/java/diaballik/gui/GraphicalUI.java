@@ -154,25 +154,28 @@ public class GraphicalUI extends Application {
         moveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String[] coordsLR = new String[2];
-                coordsLR[0] = coordinatesLeft.getText();
-                coordsLR[1] = coordinatesRight.getText();
-                //String[] coordinates = coordinatesText.getText().toString().split("-");
-                try {
-                    makeMove(coordsLR);
-                    //System.out.println("Move: " + coordinatesText.getText().toString() + "\n");
-                    madeMoveLabel.setText("Move: " + coordinatesLeft.getText().toString() + "-" + coordinatesRight.getText().toString());
-                    drawFields(root);
-                    changePlayerIfNoPossibleMoves();
-                    endIfGameWon();
-                    currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
-                } catch (IllegalMovementException e) {
-                    System.err.println("Illegal movement!");
-                    madeMoveLabel.setText("Illegal movement!");
-                } catch(ArrayIndexOutOfBoundsException | IncorrectInputException e) {
-                    System.err.println("Incorrect query!");
-                    madeMoveLabel.setText("Incorrect fields!");
-                }
+            	if(diaballik.isGameRunning()) {
+	                String[] coordsLR = new String[2];
+	                coordsLR[0] = coordinatesLeft.getText();
+	                coordsLR[1] = coordinatesRight.getText();
+	                //String[] coordinates = coordinatesText.getText().toString().split("-");
+	                try {
+	                    makeMove(coordsLR);
+	                    //System.out.println("Move: " + coordinatesText.getText().toString() + "\n");
+	                    madeMoveLabel.setText("Move: " + coordinatesLeft.getText().toString() + "-" + coordinatesRight.getText().toString());
+	                    drawFields(root);
+	                    changePlayerIfNoPossibleMoves();
+	                    drawFields(root);
+	                    endIfGameWon();
+	                    currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
+	                } catch (IllegalMovementException e) {
+	                    System.err.println("Illegal movement!");
+	                    madeMoveLabel.setText("Illegal movement!");
+	                } catch(ArrayIndexOutOfBoundsException | IncorrectInputException e) {
+	                    System.err.println("Incorrect query!");
+	                    madeMoveLabel.setText("Incorrect fields!");
+	                }
+            	}
             }
         });
         root.getChildren().add(moveButton);
@@ -185,9 +188,11 @@ public class GraphicalUI extends Application {
         nextTurnButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                diaballik.changePlayer();
-                drawFields(root);
-                currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
+            	if(diaballik.isGameRunning()) {
+	                diaballik.changePlayer();
+	                drawFields(root);
+	                currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
+            	}
             }
         });
         root.getChildren().add(nextTurnButton);
