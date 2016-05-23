@@ -9,6 +9,6 @@ public class Diaballik  {
         //ui.initializeUI();
         
         GraphicalUI ui = new GraphicalUI();
-        ui.pseudoMain();
+        ui.initializeUI();
     }
 }
