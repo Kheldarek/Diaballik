@@ -3,3 +3,5 @@
 /*.project
 /*.vpp
 /.classpath
+.settings
+target

@@ -1,15 +1,13 @@
 package diaballik.logic;
 
-import com.sun.corba.se.impl.oa.poa.AOMEntry;
+import java.util.List;
+
 import diaballik.AI.AiPlayer;
 import diaballik.AI.Move;
-import diaballik.logic.Board;
 import diaballik.logic.board.Coordinate;
 import diaballik.logic.board.Field;
 import diaballik.logic.board.IllegalMovementException;
 import diaballik.logic.board.MovementType;
-
-import java.util.List;
 
 public class Game {
 	private boolean gameRunningFlag = true;
