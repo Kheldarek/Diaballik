@@ -5,6 +5,7 @@ import diaballik.AI.AiPlayer;
 import diaballik.AI.Move;
 import diaballik.logic.Board;
 import diaballik.logic.board.Coordinate;
+import diaballik.logic.board.Field;
 import diaballik.logic.board.IllegalMovementException;
 import diaballik.logic.board.MovementType;
 
@@ -44,16 +45,24 @@ public class Game {
     	 }
     	 else if(MovementType.BALL_THROW.equals(currentMove) && !thrownBall) {
     	 	thrownBall = true;
+    	 	execute(from, to);
     	 }
     	 else if(MovementType.PIECE_MOVEMENT.equals(currentMove) && movementCounter < 2) {
     	 	movementCounter++;
+    	 	execute(from, to);
     	 }
-    	execute(from, to);
+    	 else {
+    		 throw new IllegalMovementException();
+    	 }
 	}
 	
     private void execute(Coordinate from, Coordinate to) {
 		board.actualize(from, to);
 	}
+    
+    public Field getField(Coordinate position) {
+    	return board.getField(position);
+    }
 
 	public boolean checkIsAnyMovePossible() {
     	return (movementCounter < 2 || !thrownBall);

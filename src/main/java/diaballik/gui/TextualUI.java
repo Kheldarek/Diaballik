@@ -21,7 +21,7 @@ public class TextualUI {
     	}
     }
     
-    private void loadGame() {
+    public void loadGame() {
 		System.out.println("Diaballik\n"); 
 		diaballik = ApplicationBuilder.createGame();
 	}
