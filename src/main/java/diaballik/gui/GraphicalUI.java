@@ -29,25 +29,33 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class GraphicalUI extends Application {
-    
+
     private static Game diaballik = ApplicationBuilder.createGame();
-    
+    TextField coordinatesLeft = new TextField("a1");
+    TextField coordinatesRight = new TextField("a2");
+    //TextField coordinatesText = new TextField("a1-a2");
+    Label madeMoveLabel = new Label();
+    Label currentPlayerLabel = new Label();
+    Button moveButton = new Button();
+    Button nextTurnButton = new Button();
+    //Button quitButton = new Button();
+
     private Parent createContent(Stage primaryStage){
         Pane root = new Pane();
         root.setPrefSize(850, 750);
-        
+
         //Text text = new Text(Integer.toString(i));
         //root.getChildren().add(text);
-        
+
         drawFields(root);
 
-        TextField coordinatesLeft = new TextField("a1");
+        //TextField coordinatesLeft = new TextField("a1");
         coordinatesLeft.setMaxSize(30, 20);
         coordinatesLeft.setLayoutX(735);
         coordinatesLeft.setLayoutY(50);
         root.getChildren().add(coordinatesLeft);
 
-        TextField coordinatesRight = new TextField("a2");
+        //TextField coordinatesRight = new TextField("a2");
         coordinatesRight.setMaxSize(30, 20);
         coordinatesRight.setLayoutX(775);
         coordinatesRight.setLayoutY(50);
@@ -59,7 +67,7 @@ public class GraphicalUI extends Application {
         coordinatesText.setLayoutY(10);
         root.getChildren().add(coordinatesText);*/
 
-        Label madeMoveLabel = new Label();
+        //Label madeMoveLabel = new Label();
         madeMoveLabel.setText("");
         madeMoveLabel.setLayoutX(735);
         madeMoveLabel.setLayoutY(110);
@@ -67,7 +75,7 @@ public class GraphicalUI extends Application {
         madeMoveLabel.setWrapText(true);
         root.getChildren().add(madeMoveLabel);
 
-        Label currentPlayerLabel = new Label();
+        //Label currentPlayerLabel = new Label();
         currentPlayerLabel.setText("Current player: PLAYER_1");
         currentPlayerLabel.setLayoutX(735);
         currentPlayerLabel.setLayoutY(135);
@@ -75,7 +83,7 @@ public class GraphicalUI extends Application {
         currentPlayerLabel.setWrapText(true);
         root.getChildren().add(currentPlayerLabel);
 
-        Button moveButton = new Button();
+        //Button moveButton = new Button();
         moveButton.setText("Make a move");
         moveButton.setLayoutX(730);
         moveButton.setLayoutY(80);
@@ -96,14 +104,16 @@ public class GraphicalUI extends Application {
                     currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
                 } catch (IllegalMovementException e) {
                     System.err.println("Illegal movement!");
+                    madeMoveLabel.setText("Illegal movement!");
                 } catch(ArrayIndexOutOfBoundsException | IncorrectInputException e) {
                     System.err.println("Incorrect query!");
+                    madeMoveLabel.setText("Incorrect fields!");
                 }
             }
         });
         root.getChildren().add(moveButton);
-        
-        Button nextTurnButton = new Button();
+
+        //Button nextTurnButton = new Button();
         nextTurnButton.setText("End turn");
         nextTurnButton.setLayoutX(735);
         nextTurnButton.setLayoutY(175);
@@ -111,11 +121,12 @@ public class GraphicalUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 diaballik.changePlayer();
+                drawFields(root);
                 currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
             }
         });
         root.getChildren().add(nextTurnButton);
-        
+
         /*Button quitButton = new Button();
         quitButton.setText("Quit game");
         quitButton.setLayoutX(735);
@@ -124,7 +135,7 @@ public class GraphicalUI extends Application {
             @Override
             public void handle(ActionEvent event) {
                 diaballik.endGame();
-                
+
                 final Stage dialog = new Stage();
                 dialog.initModality(Modality.APPLICATION_MODAL);
                 dialog.initOwner(((Node)event.getSource()).getScene().getWindow());
@@ -139,7 +150,7 @@ public class GraphicalUI extends Application {
 
         return root;
     }
-    
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setScene(new Scene(createContent(primaryStage)));
@@ -148,7 +159,7 @@ public class GraphicalUI extends Application {
         textualUI.loadGame();
         primaryStage.show();
     }
-    
+
     private class GameField extends StackPane {
         public Rectangle border;
         public Text fieldName;
@@ -164,8 +175,14 @@ public class GraphicalUI extends Application {
             getChildren().addAll(border, fieldName);
 
             setOnMouseClicked(event -> {
-                //if (event.getButton() == MouseButton.PRIMARY) coordinatesLeft.SetText();
-                //if (event.getButton() == MouseButton.SECONDARY) coordinatesRight.SetText();
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    coordinatesLeft.setText(fieldName.getText());
+                    fieldName.setStyle("-fx-font-weight: bold");
+                }
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    coordinatesRight.setText(fieldName.getText());
+                    fieldName.setStyle("-fx-font-weight: bold");
+                }
             });
         }
     }
@@ -224,11 +241,12 @@ public class GraphicalUI extends Application {
         if(diaballik.checkIsMatchEndingNow()){
             //System.out.println(diaballik.getBoard());
             System.out.println(diaballik.getCurrentPlayerName() + " won game!");
+            madeMoveLabel.setText(diaballik.getCurrentPlayerName() + " won game!"); //to be changed to a pop-up
             diaballik.endGame();
         }
     }
-    
-    public void pseudoMain(){
+
+    public void initializeUI(){
         launch();
     }
 }
