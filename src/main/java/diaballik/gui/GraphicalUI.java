@@ -311,7 +311,7 @@ public class GraphicalUI extends Application {
         primaryStage.show();
     }
 
-    public void initializeUI(){
+    public static void initializeUI(){
         launch();
     }
 }

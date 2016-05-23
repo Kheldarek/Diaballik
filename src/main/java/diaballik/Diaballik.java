@@ -8,7 +8,8 @@ public class Diaballik  {
         //TextualUI ui = new TextualUI();
         //ui.initializeUI();
         
-        GraphicalUI ui = new GraphicalUI();
-        ui.initializeUI();
+        //GraphicalUI ui = new GraphicalUI();
+        //ui.initializeUI();
+        GraphicalUI.initializeUI();
     }
 }
