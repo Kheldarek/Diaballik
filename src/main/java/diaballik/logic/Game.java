@@ -1,9 +1,14 @@
 package diaballik.logic;
 
+import com.sun.corba.se.impl.oa.poa.AOMEntry;
+import diaballik.AI.AiPlayer;
+import diaballik.AI.Move;
 import diaballik.logic.Board;
 import diaballik.logic.board.Coordinate;
 import diaballik.logic.board.IllegalMovementException;
 import diaballik.logic.board.MovementType;
+
+import java.util.List;
 
 public class Game {
 	private boolean gameRunningFlag = true;
@@ -12,10 +17,12 @@ public class Game {
     private PlayerType currentPlayer = PlayerType.PLAYER_1;
     private Board board;
     private Rulebook rules;
+	private AiPlayer aiPlayer;
     
     public Game(Board board, Rulebook rules) {
     	this.board = board;
     	this.rules = rules;
+		aiPlayer = new AiPlayer(PlayerType.PLAYER_2);
     }
     
     public String getCurrentPlayerName() {
@@ -52,14 +59,33 @@ public class Game {
     	return (movementCounter < 2 || !thrownBall);
     }
 
+	public void AiPlay()
+	{
+		aiPlayer.currentBoard =new Board(getBoard());
+		List<Move> moves = aiPlayer.Play();
+		for (Move move:moves)
+		{
+			try
+			{
+				executeMove(move.from, move.to);
+			}
+			catch (Exception e){}
+		}
+		changePlayer();
+	}
+
     public void changePlayer() {
+		resetCounters();
 		if(currentPlayer.equals(PlayerType.PLAYER_1)) {
 			currentPlayer = PlayerType.PLAYER_2;
+			AiPlay();
+
 		}
 		else {
 			currentPlayer = PlayerType.PLAYER_1;
+
 		}
-		resetCounters();
+
 	}
 
 	private void resetCounters() {
