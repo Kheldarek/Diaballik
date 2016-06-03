@@ -25,7 +25,7 @@ public class Tree
 		max.grade = 999999;
 		for (Node x : init.children)
 		{
-			if(x.grade<max.grade)
+			if(x.grade<=max.grade)
 				max=x;
 		}
 		return max;

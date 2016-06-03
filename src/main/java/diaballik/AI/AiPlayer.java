@@ -37,7 +37,10 @@ public class AiPlayer
 		piecesPositions = new ArrayList<>();
 		allPosibleCoord = new ArrayList<>();
 		generator = new Random();
-		depth = 8;
+		depth = 6;
+		final int WIN = 2000;
+		final int LOSS = -2000;
+
 		for (int i = 0; i < 7; i++)
 		{
 			for (int j = 0; j < 7; j++)
@@ -48,19 +51,34 @@ public class AiPlayer
 		}
 	}
 
-	private Coordinate[] getPiecesPositions(Board board)
+	private Coordinate[] getPlayerPiecesPositions(Board board, PlayerType player)
 	{
 		Coordinate[] tmpPieceList = new Coordinate[7];
 		int i = 0;
-		for (Coordinate x : allPosibleCoord)
+		if (player == PlayerType.PLAYER_2)
 		{
-			if (board.getField(x) == Field.PLAYER_2_PIECE)
+			for (Coordinate x : allPosibleCoord)
 			{
-				tmpPieceList[i] = x;
-				i++;
+				if (board.getField(x) == Field.PLAYER_2_PIECE)
+				{
+					tmpPieceList[i] = x;
+					i++;
+				}
+				if (board.getField(x) == Field.PLAYER_2_BALL)
+					tmpPieceList[6] = x;
 			}
-			if (board.getField(x) == Field.PLAYER_2_BALL)
-				tmpPieceList[6] = x;
+		} else
+		{
+			for (Coordinate x : allPosibleCoord)
+			{
+				if (board.getField(x) == Field.PLAYER_1_PIECE)
+				{
+					tmpPieceList[i] = x;
+					i++;
+				}
+				if (board.getField(x) == Field.PLAYER_1_BALL)
+					tmpPieceList[6] = x;
+			}
 		}
 		return tmpPieceList;
 	}
@@ -70,28 +88,39 @@ public class AiPlayer
 
 		gameTree = new Tree();
 		gameTree.root = new Node();
-		GenerateGameTree(gameTree.root, new Board(currentBoard), getPiecesPositions(currentBoard), depth * 3);
-		gameTree.root.grade = MinMax(gameTree.root, 3, true);
+		GenerateGameTree(gameTree.root, new Board(currentBoard), getPlayerPiecesPositions(currentBoard, player), depth, player);
+		gameTree.root.grade = MinMax(gameTree.root,new Board(currentBoard), depth * 3, false);
 		return Move();
 	}
 
-	public void GenerateGameTree(Node node, Board board, Coordinate[] pieces, int depth)
+	public void GenerateGameTree(Node node, Board board, Coordinate[] pieces, int depth, PlayerType currentPlayer)
 	{
 		if (depth <= 0) return;
+
 		for (Move move : generatePosibleMoves(board, pieces))
 		{
 			node.children.add(new Node(move));
 		}
+		depth--;
+		if (depth % 3 == 0)
+			currentPlayer = ChangePlayer(currentPlayer);
 		for (Node next : node.children)
 		{
-
-
 			Board newBoard = new Board(board);
 			if (node.move != null)
 				newBoard.actualize(node.move.from, node.move.to);
-			GenerateGameTree(next, new Board(newBoard), getPiecesPositions(newBoard), --depth);
+			GenerateGameTree(next, new Board(newBoard), getPlayerPiecesPositions(newBoard, currentPlayer), depth, currentPlayer);
 
 		}
+	}
+
+	PlayerType ChangePlayer(PlayerType p)
+	{
+		if (p == PlayerType.PLAYER_1)
+			return PlayerType.PLAYER_2;
+		else
+			return PlayerType.PLAYER_1;
+
 	}
 
 	public List<Move> generatePosibleMoves(Board board, Coordinate[] pieces)
@@ -136,18 +165,28 @@ public class AiPlayer
 	}
 
 
-	public int MinMax(Node node, int depth, boolean maximizing)
+	public int MinMax(Node node, Board board, int depth, boolean maximizing)
 	{
 
 		if (depth == 0 || node.children.isEmpty())
-			return EvaluateMove();
+		{
+			Board nextBoard = new Board(board);
+			nextBoard.actualize(node.move.from, node.move.to);
+			return EvaluateMove(nextBoard,node.move, maximizing);
+		}
+		if (depth % 3 == 0)
+		{
+			maximizing = !maximizing;
+		}
 
 		if (maximizing)
 		{
 			int bestValue = -999999;
 			for (Node tmpNode : node.children)
 			{
-				tmpNode.grade = MinMax(tmpNode, depth - 1, true);
+				Board nextBoard = new Board(board);
+				nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
+				tmpNode.grade = MinMax(tmpNode, nextBoard, --depth, maximizing);
 				if (tmpNode.grade > bestValue) bestValue = tmpNode.grade;
 
 			}
@@ -157,8 +196,11 @@ public class AiPlayer
 			int bestValue = 999999;
 			for (Node tmpNode : node.children)
 			{
-				tmpNode.grade = MinMax(tmpNode, depth - 1, true);
-				bestValue = gameTree.FindWorstMove(tmpNode).grade;
+				Board nextBoard = new Board(board);
+				nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
+				tmpNode.grade = MinMax(tmpNode, nextBoard, --depth, maximizing);
+				//bestValue = gameTree.FindWorstMove(tmpNode).grade;
+				if(tmpNode.grade<bestValue) bestValue = tmpNode.grade;
 				return bestValue;
 			}
 			return bestValue;
@@ -179,9 +221,13 @@ public class AiPlayer
 		return moves;
 	}
 
-	public int EvaluateMove()
+	public int EvaluateMove(Board board, Move move, boolean maximizing)
 	{
-		return generator.nextInt(1000) + 1;
+
+
+		return 7 - move.to.getRow();
+
+
 	}
 
 
