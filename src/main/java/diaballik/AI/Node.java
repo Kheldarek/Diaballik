@@ -1,5 +1,6 @@
 package diaballik.AI;
 
+import diaballik.logic.Board;
 import diaballik.logic.board.Coordinate;
 
 import java.util.ArrayList;
