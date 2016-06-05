@@ -36,13 +36,13 @@ public class GraphicalUI extends Application {
     private TextField coordinatesLeft = new TextField("a1");
     private TextField coordinatesRight = new TextField("a2");
     private TextField coordinatesText = new TextField("a1-a2");//not used/initialized
-    private TextField piotrkowyTF = new TextField("TYPE MEEE");
+    private TextField piotrowyTF = new TextField("Depth(1-2)");
     private Label madeMoveLabel = new Label();
     private Label currentPlayerLabel = new Label();
     private Button moveButton = new Button();
     private Button nextTurnButton = new Button();
     private Button quitButton = new Button();//not used/initialized
-    private Button piotrkowyButton = new Button();
+    private Button piotrowyButton = new Button();
 
     private Image bluePlayerImg = new Image("file:playerBlue.png");
     private Image bluePlayerBallImg = new Image("file:playerBlueBall.png");
@@ -100,11 +100,11 @@ public class GraphicalUI extends Application {
         root.getChildren().add(coordinatesText);
     }
     private void addTextFieldPioter(Pane root){
-//TextField piotrkowyTF = new TextField();
-        piotrkowyTF.setMaxSize(80, 20);
-        piotrkowyTF.setLayoutX(740);
-        piotrkowyTF.setLayoutY(300);
-        root.getChildren().add(piotrkowyTF);
+//TextField piotrowyTF = new TextField();
+        piotrowyTF.setMaxSize(80, 20);
+        piotrowyTF.setLayoutX(740);
+        piotrowyTF.setLayoutY(300);
+        root.getChildren().add(piotrowyTF);
     }
     private void addLabelMadeMove(Pane root){
 //Label madeMoveLabel = new Label();
@@ -197,17 +197,14 @@ public class GraphicalUI extends Application {
         root.getChildren().add(quitButton);
     }
     private void addButtonPioter(Pane root){
-//Button piotrkowyButton = new Button();
-        piotrkowyButton.setText("CLICK MEEE");
-        piotrkowyButton.setLayoutX(740);
-        piotrkowyButton.setLayoutY(330);
-        piotrkowyButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                //do stuff
-            }
-        });
-        root.getChildren().add(piotrkowyButton);
+//Button piotrowyButton = new Button();
+        piotrowyButton.setText("CLICK MEEE");
+        piotrowyButton.setLayoutX(740);
+        piotrowyButton.setLayoutY(330);
+        piotrowyButton.setOnAction(event -> {
+            diaballik.aiPlayer.depth = Integer.parseInt(piotrowyTF.getText());
+		});
+        root.getChildren().add(piotrowyButton);
     }
 
     private void initTeams(){

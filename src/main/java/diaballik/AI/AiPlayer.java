@@ -26,7 +26,7 @@ public class AiPlayer
 	Coordinate ballPosition;
 	List<Coordinate> allPosibleCoord;
 	Random generator;
-	int depth;
+	public int depth;
 	final int WIN = 2000;
 	final int LOSS = -2000;
 

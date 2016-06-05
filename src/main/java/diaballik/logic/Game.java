@@ -16,7 +16,7 @@ public class Game {
     private PlayerType currentPlayer = PlayerType.PLAYER_1;
     private Board board;
     private Rulebook rules;
-	private AiPlayer aiPlayer;
+	public AiPlayer aiPlayer;
     
     public Game(Board board, Rulebook rules) {
     	this.board = board;
