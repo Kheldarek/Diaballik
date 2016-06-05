@@ -29,12 +29,14 @@ public class AiPlayer
 	public int depth;
 	final int WIN = 2000;
 	final int LOSS = -2000;
+	List<Move> last3;
 
 
 	public AiPlayer(PlayerType p)
 	{
 		player = p;
 		moves = new ArrayList<>();
+		last3 = new ArrayList<>();
 		rulebook = new Rulebook();
 		piecesPositions = new ArrayList<>();
 		allPosibleCoord = new ArrayList<>();
@@ -92,7 +94,7 @@ public class AiPlayer
 		gameTree.root.parent = gameTree.root;
 		gameTree.root.player = player;
 		GenerateGameTree(gameTree.root, new Board(currentBoard), getPlayerPiecesPositions(currentBoard, player), depth * 3, player);
-		gameTree.root.grade = MinMax(gameTree.root, new Board(currentBoard), depth * 3 , false);
+		gameTree.root.grade = MinMax(gameTree.root, new Board(currentBoard), depth * 3, false);
 		return Move();
 	}
 
@@ -100,28 +102,29 @@ public class AiPlayer
 	{
 		if (depth <= 0) return;
 		Node tmp = new Node();
-		if(node.player != currentPlayer)
+		if (node.player != currentPlayer)
 		{
-			tmp.moves=0;
+			tmp.moves = 0;
 			tmp.passed = false;
-		}
-		else
+		} else
 		{
-			tmp.moves=node.moves;
+			tmp.moves = node.moves;
 			tmp.passed = node.passed;
 		}
 		for (Move move : generatePossibleMoves(tmp, board, pieces, currentPlayer))
 		{
+
 			if (node.parent.player == currentPlayer)
 			{
 				if (move.type == MovementType.BALL_THROW || node.passed)
-					node.children.add(new Node(move, true, node,node.moves,currentPlayer));
+					node.children.add(new Node(move, true, node, node.moves, currentPlayer));
 				else
-					node.children.add(new Node(move, false, node,node.moves+1,currentPlayer));
+					node.children.add(new Node(move, false, node, node.moves + 1, currentPlayer));
 			} else if (move.type == MovementType.BALL_THROW)
-				node.children.add(new Node(move, true, node,node.moves,currentPlayer));
+				node.children.add(new Node(move, true, node, node.moves, currentPlayer));
 			else
-				node.children.add(new Node(move, false, node,node.moves+1,currentPlayer));
+				node.children.add(new Node(move, false, node, node.moves + 1, currentPlayer));
+
 		}
 		depth--;
 		if (depth % 3 == 0)
@@ -140,7 +143,7 @@ public class AiPlayer
 	public List<Move> generatePossibleMoves(Node node, Board board, Coordinate[] pieces, PlayerType p)
 	{
 		List<Move> pMoves = new ArrayList<>();
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 7; i++)
 		{
 			if (node.moves < 2)
 				for (int j = -1; j < 2; j = j + 2)
@@ -149,15 +152,18 @@ public class AiPlayer
 					{
 						if (rulebook.getMovementType(board, pieces[i], pieces[i].changeColumn(j), p) == MovementType.PIECE_MOVEMENT)
 						{
-							pMoves.add(new Move(pieces[i], pieces[i].changeColumn(j), MovementType.PIECE_MOVEMENT));
+							Move tmp = new Move(pieces[i], pieces[i].changeColumn(j), MovementType.PIECE_MOVEMENT);
+							pMoves.add(tmp);
 						}
 					}
 
-					if (pieces[i].changeRow(j).getRow() > 0 && pieces[i].changeRow(j).getRow() < 7)
+					if (pieces[i].changeRow(j).getRow() >= 0 && pieces[i].changeRow(j).getRow() < 7)
 					{
 						if (rulebook.getMovementType(board, pieces[i], pieces[i].changeRow(j), p) == MovementType.PIECE_MOVEMENT)
 						{
-							pMoves.add(new Move(pieces[i], pieces[i].changeRow(j), MovementType.PIECE_MOVEMENT));
+							Move tmp = new Move(pieces[i], pieces[i].changeRow(j), MovementType.PIECE_MOVEMENT);
+							pMoves.add(tmp);
+
 						}
 					}
 
@@ -166,9 +172,22 @@ public class AiPlayer
 			if (!node.passed)
 				if (rulebook.getMovementType(board, pieces[6], pieces[i], p) == MovementType.BALL_THROW)
 				{
-					pMoves.add(new Move(pieces[6], pieces[i], MovementType.BALL_THROW));
+					Move tmp = new Move(pieces[6], pieces[i], MovementType.BALL_THROW);
+					pMoves.add(tmp);
 				}
 		}
+		if (node.parent != null && node.parent.player == p)
+		{
+			pMoves.remove(node.parent.move);
+			pMoves.remove(new Move(node.parent.move.to, node.parent.move.from, node.parent.move.type));
+			if (node.parent.parent != null && node.parent.parent.player == p)
+			{
+				pMoves.remove(node.parent.parent.move);
+				pMoves.remove(new Move(node.parent.parent.move.to,
+						node.parent.parent.move.from, node.parent.parent.move.type));
+			}
+		}
+		pMoves.removeAll(last3);
 
 		return pMoves;
 
@@ -194,24 +213,24 @@ public class AiPlayer
 
 		if (depth == 0 || node.children.isEmpty())
 		{
-			return maximizing ? EvaluateMove(board, node, maximizing) : -EvaluateMove(board, node, maximizing) ;
+			return maximizing ? EvaluateMove(board, node, maximizing) : -EvaluateMove(board, node, maximizing);
 		}
 		if (depth % 3 == 0)
 		{
 			maximizing = !maximizing;
 		}
 
-			int bestValue = -999999;
-			depth--;
-			for (Node tmpNode : node.children)
-			{
-				Board nextBoard = new Board(board);
-				nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
-				tmpNode.grade = MinMax(tmpNode, nextBoard, depth, maximizing);
-				if (tmpNode.grade > bestValue) bestValue = tmpNode.grade;
+		int bestValue = -999999;
+		depth--;
+		for (Node tmpNode : node.children)
+		{
+			Board nextBoard = new Board(board);
+			nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
+			tmpNode.grade = MinMax(tmpNode, nextBoard, depth, maximizing);
+			if (tmpNode.grade > bestValue) bestValue = tmpNode.grade;
 
-			}
-			return bestValue;
+		}
+		return bestValue;
 
 	}
 
@@ -225,6 +244,8 @@ public class AiPlayer
 		moves.add(move1.move);
 		moves.add(move2.move);
 		moves.add(move3.move);
+		last3 = new ArrayList<>(moves);
+		last3.forEach(Move::revert);
 		return moves;
 	}
 
@@ -233,27 +254,26 @@ public class AiPlayer
 		int tmpGrade = 0;
 		int p1Start = 0;
 		int p2Start = 6;
-		PlayerType currentPlayer =move.player;
-		board.actualize(move.move.from,move.move.to);
-		if(rulebook.checkGameIsOver(currentPlayer,board)&&currentPlayer==player)
+		PlayerType currentPlayer = move.player;
+		board.actualize(move.move.from, move.move.to);
+		if (rulebook.checkGameIsOver(currentPlayer, board) && currentPlayer == player)
 			return WIN;
-		else if(rulebook.checkGameIsOver(currentPlayer,board)&&currentPlayer!=player)
+		else if (rulebook.checkGameIsOver(currentPlayer, board) && currentPlayer != player)
 			return LOSS;
-		board.actualize(move.move.to,move.move.from);
+		board.actualize(move.move.to, move.move.from);
 
-		if(move.player == player)
+		if (move.player == player)
 		{
 			if (move.move.to.getRow() == p1Start)
 				tmpGrade += 200;
 			else
-				tmpGrade += ((7-move.move.to.getRow()) * 10);
-		}
-		else
+				tmpGrade += ((7 - move.move.to.getRow()) * 10);
+		} else
 		{
 			if (move.move.to.getRow() == p2Start)
 				tmpGrade += 200;
 			else
-				tmpGrade += ((move.move.to.getRow()) *10);
+				tmpGrade += ((move.move.to.getRow()) * 10);
 		}
 
 		return tmpGrade;
@@ -280,8 +300,6 @@ public class AiPlayer
 
 	return res;
  */
-
-
 
 
 	}
