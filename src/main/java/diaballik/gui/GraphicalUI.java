@@ -36,13 +36,13 @@ public class GraphicalUI extends Application {
     private TextField coordinatesLeft = new TextField("a1");
     private TextField coordinatesRight = new TextField("a2");
     private TextField coordinatesText = new TextField("a1-a2");//not used/initialized
-    private TextField piotrowyTF = new TextField("Depth(1-2)");
+    private TextField AITextField = new TextField("Depth(1-2)");
     private Label madeMoveLabel = new Label();
     private Label currentPlayerLabel = new Label();
     private Button moveButton = new Button();
     private Button nextTurnButton = new Button();
     private Button quitButton = new Button();//not used/initialized
-    private Button piotrowyButton = new Button();
+    private Button AIButton = new Button();
 
     private Image bluePlayerImg = new Image("file:playerBlue.png");
     private Image bluePlayerBallImg = new Image("file:playerBlueBall.png");
@@ -62,18 +62,7 @@ public class GraphicalUI extends Application {
         Pane root = new Pane();
         root.setPrefSize(850, 725);
 
-        drawFields(root);
-
-        addTextFieldCoordinatesLeft(root);
-        addTextFieldCoordinatesRight(root);
-        //addTextFieldCoordinates(root);
-        addTextFieldPioter(root);
-        addLabelMadeMove(root);
-        addLabelCurrentPlayer(root);
-        addButtonMove(root);
-        addButtonNextTurn(root);
-        //addButtonQuit(root);
-        addButtonPioter(root);
+        drawGUI(root);
 
         return root;
     }
@@ -100,11 +89,11 @@ public class GraphicalUI extends Application {
         root.getChildren().add(coordinatesText);
     }
     private void addTextFieldPioter(Pane root){
-//TextField piotrowyTF = new TextField();
-        piotrowyTF.setMaxSize(80, 20);
-        piotrowyTF.setLayoutX(740);
-        piotrowyTF.setLayoutY(300);
-        root.getChildren().add(piotrowyTF);
+//TextField AITextField = new TextField();
+        AITextField.setMaxSize(80, 20);
+        AITextField.setLayoutX(740);
+        AITextField.setLayoutY(300);
+        root.getChildren().add(AITextField);
     }
     private void addLabelMadeMove(Pane root){
 //Label madeMoveLabel = new Label();
@@ -142,7 +131,7 @@ public class GraphicalUI extends Application {
 	                    //System.out.println("Move: " + coordinatesText.getText().toString() + "\n");
 	                    madeMoveLabel.setText("Move: " + coordinatesLeft.getText().toString() + "-" + coordinatesRight.getText().toString());
 	                    changePlayerIfNoPossibleMoves();
-	                    drawFields(root);
+	                    drawGUI(root);
 	                    endIfGameWon();
 	                    currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
 	                } catch (IllegalMovementException e) {
@@ -167,8 +156,10 @@ public class GraphicalUI extends Application {
             public void handle(ActionEvent event) {
             	if(diaballik.isGameRunning()) {
 	                diaballik.changePlayer();
-	                drawFields(root);
+	                drawGUI(root);
 	                currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
+                    previousLeftField = null;
+                    previousRightField = null;
             	}
             }
         });
@@ -197,60 +188,59 @@ public class GraphicalUI extends Application {
         root.getChildren().add(quitButton);
     }
     private void addButtonPioter(Pane root){
-//Button piotrowyButton = new Button();
-        piotrowyButton.setText("CLICK MEEE");
-        piotrowyButton.setLayoutX(740);
-        piotrowyButton.setLayoutY(330);
-        piotrowyButton.setOnAction(event -> {
-            diaballik.aiPlayer.depth = Integer.parseInt(piotrowyTF.getText());
+//Button AIButton = new Button();
+        AIButton.setText("CLICK MEEE");
+        AIButton.setLayoutX(740);
+        AIButton.setLayoutY(330);
+        AIButton.setOnAction(event -> {
+            diaballik.aiPlayer.depth = Integer.parseInt(AITextField.getText());
 		});
-        root.getChildren().add(piotrowyButton);
+        root.getChildren().add(AIButton);
     }
 
-    private void initTeams(){
-        for (int i=0; i<7; i++){
-            bluePlayers[i] = new ImageView(bluePlayerImg);
-            greenPlayers[i] = new ImageView(greenPlayerImg);
-        }
-    }
     private class GameField extends StackPane {
-        public Rectangle border;
+        public Rectangle fieldPatch;
         public Text fieldName;
         public GameField(){
-            border = new Rectangle(100, 100);
+            fieldPatch = new Rectangle(100, 100);
             fieldName = new Text();
 
-            border.setFill(Color.DIMGREY);
-            border.setStroke(Color.BROWN);
-            border.setStrokeWidth(3);
+            fieldPatch.setFill(Color.GAINSBORO);
+            fieldPatch.setStroke(Color.BLACK);
+            fieldPatch.setStrokeWidth(3);
 
             setAlignment(Pos.CENTER);
-            getChildren().addAll(border, fieldName);
+            getChildren().addAll(fieldPatch, fieldName);
 
             setOnMouseClicked(event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
+                    /* set 'selected' status */
                     coordinatesLeft.setText(fieldName.getText());
                     fieldName.setStyle("-fx-font-weight: bold");
-                    border.setStrokeWidth(4);
-                    //border.setFill(Color.BLUE);
+                    //fieldPatch.setStrokeWidth(4);
+                    fieldPatch.setFill(Color.DARKGREY);
+
+                    /* set 'clear' status if applies */
                     if(previousLeftField != null && fieldName.getText() != previousLeftField){
                         GameField tempField = (GameField) getScene().lookup("#" + previousLeftField);
                         tempField.fieldName.setStyle("<font-weight>: regular");
-                        tempField.border.setStrokeWidth(3);
-                        //tempField.border.setFill(Color.BLUE);
+                        //tempField.fieldPatch.setStrokeWidth(3);
+                        tempField.fieldPatch.setFill(Color.GAINSBORO);
                     }
                     previousLeftField = getId();
                 }
                 if (event.getButton() == MouseButton.SECONDARY) {
                     coordinatesRight.setText(fieldName.getText());
                     fieldName.setStyle("-fx-font-weight: bold");
-                    border.setStrokeWidth(4);
+                    //fieldPatch.setStrokeWidth(4);
+                    fieldPatch.setFill(Color.DARKGREY);
                     if(previousRightField != null && fieldName.getText() != previousRightField){
                         //GameField tempField = new GameField();
                         //tempField.fieldName = (Text) getScene().lookup("#" + previousRightField);
                         GameField tempField = (GameField) getScene().lookup("#" + previousRightField);
                         tempField.fieldName.setStyle("<font-weight>: regular");
-                        tempField.border.setStrokeWidth(3);
+                        //tempField.fieldPatch.setStrokeWidth(3);
+                        tempField.fieldPatch.setFill(Color.GAINSBORO);
                     }
                     //previousRightField = fieldName.getId();
                     previousRightField = getId();
@@ -258,46 +248,61 @@ public class GraphicalUI extends Application {
             });
         }
     }
-    private void drawFields(Pane root){
+    private void initTeams(){
+        for (int i=0; i<7; i++){
+            bluePlayers[i] = new ImageView(bluePlayerImg);
+            greenPlayers[i] = new ImageView(greenPlayerImg);
+
+            bluePlayers[i].setFitHeight(80);
+            bluePlayers[i].setPreserveRatio(true);
+            bluePlayers[i].setSmooth(true);
+            bluePlayers[i].setCache(true);
+
+            greenPlayers[i].setFitHeight(80);
+            greenPlayers[i].setPreserveRatio(true);
+            greenPlayers[i].setSmooth(true);
+            greenPlayers[i].setCache(true);
+        }
+        bluePlayerBall.setFitHeight(80);
+        bluePlayerBall.setPreserveRatio(true);
+        bluePlayerBall.setSmooth(true);
+        bluePlayerBall.setCache(true);
+
+        greenPlayerBall.setFitHeight(80);
+        greenPlayerBall.setPreserveRatio(true);
+        greenPlayerBall.setSmooth(true);
+        greenPlayerBall.setCache(true);
+    }
+    private void drawGUI(Pane root){
+        root.getChildren().clear();
+
         for(int i=0; i<7; i++){
             for(int j=0; j<7; j++){
                 GameField field = new GameField();
 
                 initTeams();
 
-                //Color-setting
+                //Color-setting, player-adding
                 Board board = diaballik.getBoard();
                 Coordinate position = new Coordinate(i, j);
                 if(board.getField(position) == Field.EMPTY){
-                    field.border.setFill(Color.ANTIQUEWHITE);
+                    //field.fieldPatch.setFill(Color.ANTIQUEWHITE);
                 }
                 if(board.getField(position) == Field.PLAYER_1_BALL){
-                    field.border.setFill(Color.DARKGREEN);
-                    bluePlayerBall.setFitHeight(80);
-                    bluePlayerBall.setFitWidth(84);
-                    bluePlayerBall.smoothProperty();
-                    field.getChildren().add(bluePlayerBall);
-                }
-                if(board.getField(position) == Field.PLAYER_1_PIECE){
-                    field.border.setFill(Color.LIGHTGREEN);
-                    bluePlayers[i].setFitHeight(80);
-                    bluePlayers[i].setFitWidth(84);
-                    bluePlayers[i].setSmooth(true);
-                    field.getChildren().add(bluePlayers[i]);
-                }
-                if(board.getField(position) == Field.PLAYER_2_BALL){
-                    field.border.setFill(Color.DARKSLATEBLUE);
-                    greenPlayerBall.setFitHeight(80);
-                    greenPlayerBall.setPreserveRatio(true);
-                    greenPlayerBall.setSmooth(true);
-                    greenPlayerBall.setCache(true);
+                    //field.fieldPatch.setFill(Color.DARKGREEN);
                     field.getChildren().add(greenPlayerBall);
                 }
-                if(board.getField(position) == Field.PLAYER_2_PIECE){
-                    field.border.setFill(Color.CORNFLOWERBLUE);
-                    greenPlayers[i].setPreserveRatio(true);
-                    greenPlayers[i].setFitWidth(84);
+                if(board.getField(position) == Field.PLAYER_1_PIECE){
+                    //field.fieldPatch.setFill(Color.LIGHTGREEN);
                     field.getChildren().add(greenPlayers[i]);
+                }
+                if(board.getField(position) == Field.PLAYER_2_BALL){
+                    //field.fieldPatch.setFill(Color.DARKSLATEBLUE);
+                    field.getChildren().add(bluePlayerBall);
+                }
+                if(board.getField(position) == Field.PLAYER_2_PIECE){
+                    //field.fieldPatch.setFill(Color.CORNFLOWERBLUE);
+                    field.getChildren().add(bluePlayers[i]);
                 }
 
                 //ID setting & field name displaying
@@ -338,6 +343,15 @@ public class GraphicalUI extends Application {
                 root.getChildren().add(field);
             }
         }
+
+        addTextFieldCoordinatesLeft(root);
+        addTextFieldCoordinatesRight(root);
+        addTextFieldPioter(root);
+        addLabelMadeMove(root);
+        addLabelCurrentPlayer(root);
+        addButtonMove(root);
+        addButtonNextTurn(root);
+        addButtonPioter(root);
     }
 
     private void loadGame() {
