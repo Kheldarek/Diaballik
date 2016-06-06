@@ -42,7 +42,7 @@ public class AiPlayer
 		piecesPositions = new ArrayList<>();
 		allPosibleCoord = new ArrayList<>();
 		generator = new Random();
-		depth = 2;
+		depth = 1;
 
 
 		for (int i = 0; i < 7; i++)
@@ -274,31 +274,6 @@ public class AiPlayer
 		}
 
 		return tmpGrade;
-/*
-	//odleglosc od startu
-	for ( int i = 7 * graczId; i < 7 + 7 * graczId; i++ )
-	{
-		int odl = stan->dajlOdlOdStart( i );
-
-		odl *= odl;
-		if ( odl == 6 ) odl += 20; //dodatkowa premia za stanie pionka na mecie
-		res += odl * 10; //pionek na mecie podbija res o 560
-	}
-
-	//premia: mozliwosc zagrania pilka do gracza, ktory jest na lini przeciwnika
-	std::vector <int> pilkaRuchy = stan->dajRuchy( 14 + graczId );
-	for ( int i = 0; i < (int)pilkaRuchy.size(); i++ )
-		//jesli pilka ma podanie do pionka ktory stoi na lini przeciwnika
-		if ( pilkaRuchy[i] / 7 == ((graczId + 1) % 2) * 6 )
-		{
-			res += 400;
-			break;
-		}
-
-	return res;
- */
-
-
 	}
 
 
