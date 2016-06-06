@@ -63,7 +63,6 @@ public class GraphicalUI extends Application {
         root.setPrefSize(850, 725);
 
         drawGUI(root);
-
         return root;
     }
 
@@ -272,6 +271,7 @@ public class GraphicalUI extends Application {
         greenPlayerBall.setPreserveRatio(true);
         greenPlayerBall.setSmooth(true);
         greenPlayerBall.setCache(true);
+        diaballik.gui = this;
     }
     private void drawGUI(Pane root){
         root.getChildren().clear();
@@ -368,7 +368,7 @@ public class GraphicalUI extends Application {
             diaballik.changePlayer();
         }
     }
-    private void endIfGameWon() {
+   public void endIfGameWon() {
         if(diaballik.checkIsMatchEndingNow()){
             //System.out.println(diaballik.getBoard());
             System.out.println(diaballik.getCurrentPlayerName() + " won the game!");

@@ -205,29 +205,46 @@ public class AiPlayer
 	}
 
 
-
 	public int MinMax(Node node, Board board, int depth, boolean maximizing)
 	{
 
 		if (depth == 0 || node.children.isEmpty())
 		{
-			return maximizing ? EvaluateMove(board, node, maximizing) : -EvaluateMove(board, node, maximizing);
+			return maximizing ? EvaluateMove(board, node, maximizing) : (-EvaluateMove(board, node, maximizing));
 		}
 		if (depth % 3 == 0)
 		{
 			maximizing = !maximizing;
 		}
-
-		int bestValue = -999999;
-		for (Node tmpNode : node.children)
+		if (maximizing)
 		{
-			Board nextBoard = new Board(board);
-			nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
-			tmpNode.grade = MinMax(tmpNode, nextBoard, depth-1, maximizing);
-			if (tmpNode.grade > bestValue) bestValue = tmpNode.grade;
+			int bestValue = -999999;
+			for (Node tmpNode : node.children)
+			{
+				Board nextBoard = new Board(board);
+				nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
+				tmpNode.grade = MinMax(tmpNode, nextBoard, depth - 1, maximizing);
+				if (tmpNode.grade > bestValue) bestValue = tmpNode.grade;
+
+			}
+			return bestValue;
 
 		}
-		return bestValue;
+		else
+		{
+			int bestValue = 999999;
+			for (Node tmpNode : node.children)
+			{
+				Board nextBoard = new Board(board);
+				nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
+				tmpNode.grade = MinMax(tmpNode, nextBoard, --depth, maximizing);
+				//bestValue = gameTree.FindWorstMove(tmpNode).grade;
+				if (tmpNode.grade < bestValue) bestValue = tmpNode.grade;
+
+			}
+			return bestValue;
+		}
+		//return bestValue;
 
 	}
 

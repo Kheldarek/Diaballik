@@ -4,6 +4,7 @@ import java.util.List;
 
 import diaballik.AI.AiPlayer;
 import diaballik.AI.Move;
+import diaballik.gui.GraphicalUI;
 import diaballik.logic.board.Coordinate;
 import diaballik.logic.board.Field;
 import diaballik.logic.board.IllegalMovementException;
@@ -17,6 +18,7 @@ public class Game {
     private Board board;
     private Rulebook rules;
 	public AiPlayer aiPlayer;
+	public GraphicalUI gui;
     
     public Game(Board board, Rulebook rules) {
     	this.board = board;
@@ -78,7 +80,7 @@ public class Game {
 			}
 			catch (Exception e){}
 		}
-
+		gui.endIfGameWon();
 		changePlayer();
 	}
 
