@@ -8,6 +8,7 @@ import diaballik.logic.board.Field;
 import diaballik.logic.board.MovementType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -27,8 +28,8 @@ public class AiPlayer
 	List<Coordinate> allPosibleCoord;
 	Random generator;
 	public int depth;
-	final int WIN = 2000;
-	final int LOSS = -2000;
+	final int WIN = 10000;
+	final int LOSS = -10000;
 	List<Move> last3;
 
 
@@ -41,7 +42,7 @@ public class AiPlayer
 		piecesPositions = new ArrayList<>();
 		allPosibleCoord = new ArrayList<>();
 		generator = new Random();
-		depth = 1;
+		depth = 2;
 
 
 		for (int i = 0; i < 7; i++)
@@ -126,6 +127,7 @@ public class AiPlayer
 				node.children.add(new Node(move, false, node, node.moves + 1, currentPlayer));
 
 		}
+		Collections.shuffle(node.children, new Random(System.currentTimeMillis()));
 		depth--;
 		if (depth % 3 == 0)
 			currentPlayer = ChangePlayer(currentPlayer);
@@ -202,10 +204,6 @@ public class AiPlayer
 
 	}
 
-	public void AlphaBeta()
-	{
-
-	}
 
 
 	public int MinMax(Node node, Board board, int depth, boolean maximizing)
@@ -221,12 +219,11 @@ public class AiPlayer
 		}
 
 		int bestValue = -999999;
-		depth--;
 		for (Node tmpNode : node.children)
 		{
 			Board nextBoard = new Board(board);
 			nextBoard.actualize(tmpNode.move.from, tmpNode.move.to);
-			tmpNode.grade = MinMax(tmpNode, nextBoard, depth, maximizing);
+			tmpNode.grade = MinMax(tmpNode, nextBoard, depth-1, maximizing);
 			if (tmpNode.grade > bestValue) bestValue = tmpNode.grade;
 
 		}
