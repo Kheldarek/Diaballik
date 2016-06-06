@@ -30,6 +30,8 @@ import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+
 public class GraphicalUI extends Application {
 
     private static Game diaballik = ApplicationBuilder.createGame();
@@ -133,6 +135,7 @@ public class GraphicalUI extends Application {
 	                    drawGUI(root);
 	                    endIfGameWon();
 	                    currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
+                        showTheWinner(event);
 	                } catch (IllegalMovementException e) {
 	                    System.err.println("Illegal movement!");
 	                    madeMoveLabel.setText("Illegal movement!");
@@ -159,6 +162,7 @@ public class GraphicalUI extends Application {
 	                currentPlayerLabel.setText("Current player: " + diaballik.getCurrentPlayerName());
                     previousLeftField = null;
                     previousRightField = null;
+                    showTheWinner(event);
             	}
             }
         });
@@ -186,9 +190,9 @@ public class GraphicalUI extends Application {
         });
         root.getChildren().add(quitButton);
     }
-    private void addButtonPioter(Pane root){
+    private void addButtonAI(Pane root){
 //Button AIButton = new Button();
-        AIButton.setText("CLICK MEEE");
+        AIButton.setText("Change AI");
         AIButton.setLayoutX(740);
         AIButton.setLayoutY(330);
         AIButton.setOnAction(event -> {
@@ -271,10 +275,10 @@ public class GraphicalUI extends Application {
         greenPlayerBall.setPreserveRatio(true);
         greenPlayerBall.setSmooth(true);
         greenPlayerBall.setCache(true);
-        diaballik.gui = this;
     }
     private void drawGUI(Pane root){
         root.getChildren().clear();
+        diaballik.gui = this;
 
         for(int i=0; i<7; i++){
             for(int j=0; j<7; j++){
@@ -351,9 +355,22 @@ public class GraphicalUI extends Application {
         addLabelCurrentPlayer(root);
         addButtonMove(root);
         addButtonNextTurn(root);
-        addButtonPioter(root);
+        addButtonAI(root);
     }
 
+    private void showTheWinner(ActionEvent event){
+        if(diaballik.checkIsMatchEndingNow()) {
+            final Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(((Node) event.getSource()).getScene().getWindow());
+            VBox dialogVbox = new VBox(150);
+            dialogVbox.getChildren().add(new Text(diaballik.getCurrentPlayerName() + " won the game!"));
+            Scene dialogScene = new Scene(dialogVbox, 150, 50);
+            dialog.setScene(dialogScene);
+            dialog.show();
+        }
+
+    }
     private void loadGame() {
         //System.out.println("Diaballik\n");
         diaballik = ApplicationBuilder.createGame();
@@ -368,7 +385,7 @@ public class GraphicalUI extends Application {
             diaballik.changePlayer();
         }
     }
-   public void endIfGameWon() {
+    public void endIfGameWon() {
         if(diaballik.checkIsMatchEndingNow()){
             //System.out.println(diaballik.getBoard());
             System.out.println(diaballik.getCurrentPlayerName() + " won the game!");

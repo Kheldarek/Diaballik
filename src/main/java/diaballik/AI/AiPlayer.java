@@ -259,7 +259,14 @@ public class AiPlayer
 		moves.add(move2.move);
 		moves.add(move3.move);
 		last3 = new ArrayList<>(moves);
-		last3.forEach(Move::revert);
+		try
+		{
+			last3.forEach(Move::revert);
+		}
+		catch(Exception e)
+		{
+
+		}
 		return moves;
 	}
 
